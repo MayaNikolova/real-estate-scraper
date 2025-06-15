@@ -228,26 +228,29 @@
         
         <div class="input-group">
             <label for="url">Real Estate URL:</label>
-            <input type="text" id="url" placeholder="Enter a realestate.co.nz URL (e.g., https://www.realestate.co.nz/residential/sale/auckland/...)">
+            <input type="text" id="url" placeholder="Enter any realestate.co.nz URL (e.g., https://www.realestate.co.nz/...)">
             <div id="urlValidation" class="validation-message"></div>
             
             <div class="url-examples">
-                <h4>📍 Quick Fill - Popular Locations:</h4>
+                <h4>📍 Quick Fill - Popular Pages:</h4>
                 <div class="quick-fill-buttons">
-                    <button class="quick-fill-btn" onclick="fillURL('auckland/auckland-city')">Auckland City</button>
-                    <button class="quick-fill-btn" onclick="fillURL('auckland/north-shore-city')">North Shore</button>
-                    <button class="quick-fill-btn" onclick="fillURL('auckland/manukau-city/howick')">Howick</button>
-                    <button class="quick-fill-btn" onclick="fillURL('wellington/wellington-city')">Wellington</button>
-                    <button class="quick-fill-btn" onclick="fillURL('canterbury/christchurch-city')">Christchurch</button>
-                    <button class="quick-fill-btn" onclick="fillURL('otago/dunedin-city')">Dunedin</button>
+                    <button class="quick-fill-btn" onclick="fillURL('residential/sale/auckland/auckland-city')">Auckland Sale</button>
+                    <button class="quick-fill-btn" onclick="fillURL('residential/rent/auckland/auckland-city')">Auckland Rent</button>
+                    <button class="quick-fill-btn" onclick="fillURL('residential/sale/wellington/wellington-city')">Wellington Sale</button>
+                    <button class="quick-fill-btn" onclick="fillURL('residential/rent/wellington/wellington-city')">Wellington Rent</button>
+                    <button class="quick-fill-btn" onclick="fillURL('commercial/sale')">Commercial Sale</button>
+                    <button class="quick-fill-btn" onclick="fillURL('commercial/lease')">Commercial Lease</button>
                 </div>
                 
                 <h4 style="margin-top: 15px;">💡 Example URLs:</h4>
                 <ul>
-                    <li onclick="fillExampleURL('https://www.realestate.co.nz/residential/sale/auckland/auckland-city?by=oldest')">Auckland City (oldest first)</li>
-                    <li onclick="fillExampleURL('https://www.realestate.co.nz/residential/sale/wellington/wellington-city?by=newest')">Wellington (newest first)</li>
-                    <li onclick="fillExampleURL('https://www.realestate.co.nz/residential/sale/canterbury/christchurch-city?by=price_asc')">Christchurch (price low-high)</li>
-                    <li onclick="fillExampleURL('https://www.realestate.co.nz/residential/sale/auckland/manukau-city/howick?by=oldest&ins=true')">Howick (oldest, include under contract)</li>
+                    <li onclick="fillExampleURL('https://www.realestate.co.nz/residential/sale/auckland/auckland-city?by=oldest')">Residential Sale - Auckland (oldest first)</li>
+                    <li onclick="fillExampleURL('https://www.realestate.co.nz/residential/rent/wellington/wellington-city?by=newest')">Residential Rent - Wellington (newest first)</li>
+                    <li onclick="fillExampleURL('https://www.realestate.co.nz/commercial/sale?by=price_asc')">Commercial Sale (price low-high)</li>
+                    <li onclick="fillExampleURL('https://www.realestate.co.nz/commercial/lease?by=price_desc')">Commercial Lease (price high-low)</li>
+                    <li onclick="fillExampleURL('https://www.realestate.co.nz/rural/sale')">Rural Properties for Sale</li>
+                    <li onclick="fillExampleURL('https://www.realestate.co.nz/lifestyle/sale')">Lifestyle Properties</li>
+                    <li onclick="fillExampleURL('https://www.realestate.co.nz/retirement/sale')">Retirement Villages</li>
                 </ul>
             </div>
         </div>
@@ -289,7 +292,7 @@
 
         // URL validation
         function validateURL(url) {
-            const validPattern = /^https:\/\/www\.realestate\.co\.nz\/residential\/sale\/.+/;
+            const validPattern = /^https:\/\/www\.realestate\.co\.nz\/.+/;
             return validPattern.test(url);
         }
 
@@ -306,9 +309,9 @@
         }
 
         // Quick fill functions
-        function fillURL(location) {
-            const baseURL = 'https://www.realestate.co.nz/residential/sale/';
-            const fullURL = baseURL + location + '?by=oldest';
+        function fillURL(path) {
+            const baseURL = 'https://www.realestate.co.nz/';
+            const fullURL = baseURL + path + '?by=oldest';
             document.getElementById('url').value = fullURL;
             validateAndShowURL(fullURL);
         }
@@ -342,7 +345,7 @@
             urlInput.addEventListener('blur', function() {
                 const url = this.value.trim();
                 if (url !== '' && !validateURL(url)) {
-                    showURLValidation(false, '❌ URL must start with https://www.realestate.co.nz/residential/sale/');
+                    showURLValidation(false, '❌ URL must be from realestate.co.nz (e.g., https://www.realestate.co.nz/...)');
                 }
             });
         });
@@ -358,7 +361,7 @@
             }
             
             if (!validateURL(url)) {
-                showStatus('❌ Please enter a valid realestate.co.nz residential sale URL', 'error');
+                showStatus('❌ Please enter a valid realestate.co.nz URL', 'error');
                 return;
             }
             
@@ -381,7 +384,7 @@
                 const totalPages = Math.floor(Math.random() * 20) + 10; // Random number of pages (10-30)
                 
                 for (let page = 1; page <= totalPages; page++) {
-                    showStatus(`🔄 Scraping page ${page} of ${totalPages} from ${locationInfo.area}...`, 'loading');
+                    showStatus(`🔄 Scraping page ${page} of ${totalPages} from ${locationInfo.fullType} in ${locationInfo.area}...`, 'loading');
                     
                     // Simulate delay for realistic scraping experience
                     await new Promise(resolve => setTimeout(resolve, 300));
@@ -397,7 +400,7 @@
                 
                 scrapedData = allListings;
                 displayResults(allListings, url);
-                showStatus(`✅ Completed! Found ${allListings.length} listings across ${totalPages} pages from ${locationInfo.area}`, 'success');
+                showStatus(`✅ Completed! Found ${allListings.length} listings across ${totalPages} pages from ${locationInfo.fullType} in ${locationInfo.area}`, 'success');
                 
             } catch (error) {
                 console.error('Error:', error);
@@ -409,35 +412,66 @@
         }
 
         function extractLocationFromURL(url) {
-            // Extract location information from URL for more realistic data
+            // Extract information from any realestate.co.nz URL
             const urlParts = url.split('/');
-            const region = urlParts[5] || 'Unknown Region';
-            const city = urlParts[6] || 'Unknown City';
-            const suburb = urlParts[7] || '';
+            let category = 'Real Estate';
+            let type = '';
+            let region = '';
+            let city = '';
+            let suburb = '';
+            
+            // Determine category and type
+            if (urlParts.length > 4) {
+                category = urlParts[4] || 'real-estate'; // residential, commercial, rural, lifestyle, etc.
+                type = urlParts[5] || ''; // sale, rent, lease
+            }
+            
+            // Extract location for residential/commercial with locations
+            if (urlParts.length > 6) {
+                region = urlParts[6] || '';
+                city = urlParts[7] || '';
+                suburb = urlParts[8] || '';
+            }
+            
+            // Format category and type
+            const formattedCategory = category.charAt(0).toUpperCase() + category.slice(1);
+            const formattedType = type ? ` - ${type.charAt(0).toUpperCase() + type.slice(1)}` : '';
+            
+            // Format location parts
+            const formatLocationPart = (part) => {
+                return part ? part.replace(/-/g, ' ').split(' ').map(word => 
+                    word.charAt(0).toUpperCase() + word.slice(1)
+                ).join(' ') : '';
+            };
+            
+            const formattedRegion = formatLocationPart(region);
+            const formattedCity = formatLocationPart(city);
+            const formattedSuburb = formatLocationPart(suburb);
+            
+            // Determine the best area name to use
+            let area = formattedCategory;
+            if (formattedSuburb) area = formattedSuburb;
+            else if (formattedCity) area = formattedCity;
+            else if (formattedRegion) area = formattedRegion;
             
             return {
-                region: region.charAt(0).toUpperCase() + region.slice(1),
-                city: city.replace(/-/g, ' ').split(' ').map(word => 
-                    word.charAt(0).toUpperCase() + word.slice(1)
-                ).join(' '),
-                suburb: suburb.replace(/-/g, ' ').split(' ').map(word => 
-                    word.charAt(0).toUpperCase() + word.slice(1)
-                ).join(' '),
-                area: suburb ? suburb.replace(/-/g, ' ').split(' ').map(word => 
-                    word.charAt(0).toUpperCase() + word.slice(1)
-                ).join(' ') : city.replace(/-/g, ' ').split(' ').map(word => 
-                    word.charAt(0).toUpperCase() + word.slice(1)
-                ).join(' ')
+                category: formattedCategory,
+                type: formattedType,
+                region: formattedRegion,
+                city: formattedCity,
+                suburb: formattedSuburb,
+                area: area,
+                fullType: `${formattedCategory}${formattedType}`
             };
         }
 
         function generatePageListings(pageNum, totalPages, locationInfo) {
-            // Generate realistic sample data for each page based on location
+            // Generate realistic sample data for each page based on URL type
             const listings = [];
-            const listingsPerPage = pageNum === totalPages ? Math.floor(Math.random() * 15) + 5 : 20; // Last page has fewer items
+            const listingsPerPage = pageNum === totalPages ? Math.floor(Math.random() * 15) + 5 : 20;
             
-            // Generate location-appropriate street names
-            const streetNames = generateStreetNames(locationInfo);
+            // Generate appropriate property names based on category
+            const properties = generatePropertyNames(locationInfo);
             
             const dateOptions = [
                 'Listed 5 years ago', 'Listed 4 years ago', 'Listed 3 years ago', 
@@ -448,15 +482,12 @@
             ];
             
             for (let i = 0; i < listingsPerPage; i++) {
-                const houseNum = Math.floor(Math.random() * 200) + 1;
-                const unitNum = Math.random() > 0.7 ? `${Math.floor(Math.random() * 20) + 1}/` : '';
-                const streetName = streetNames[Math.floor(Math.random() * streetNames.length)];
-                const address = `${unitNum}${houseNum} ${streetName}, ${locationInfo.area}`;
+                const property = properties[Math.floor(Math.random() * properties.length)];
                 const date = dateOptions[Math.floor(Math.random() * dateOptions.length)];
                 
                 listings.push({
                     date: date,
-                    address: address,
+                    address: property,
                     page: pageNum
                 });
             }
@@ -464,33 +495,120 @@
             return listings;
         }
 
-        function generateStreetNames(locationInfo) {
-            // Base street names that work for any location
-            const baseStreets = [
+        function generatePropertyNames(locationInfo) {
+            const category = locationInfo.category.toLowerCase();
+            const area = locationInfo.area;
+            
+            if (category === 'residential') {
+                return generateResidentialProperties(area);
+            } else if (category === 'commercial') {
+                return generateCommercialProperties(area);
+            } else if (category === 'rural') {
+                return generateRuralProperties(area);
+            } else if (category === 'lifestyle') {
+                return generateLifestyleProperties(area);
+            } else if (category === 'retirement') {
+                return generateRetirementProperties(area);
+            } else {
+                return generateGenericProperties(area);
+            }
+        }
+
+        function generateResidentialProperties(area) {
+            const streetNames = [
                 'Main Street', 'High Street', 'Church Street', 'Queen Street', 'King Street',
                 'Park Road', 'Mill Road', 'Hill Road', 'Lake Road', 'Beach Road',
                 'First Avenue', 'Second Avenue', 'Third Avenue', 'Victoria Street',
                 'Albert Street', 'George Street', 'Elizabeth Street', 'James Street'
             ];
-
-            // Location-specific street names
-            const locationStreets = {
-                'Auckland': ['Karangahape Road', 'Ponsonby Road', 'Parnell Road', 'Remuera Road', 'Mt Eden Road'],
-                'Wellington': ['Lambton Quay', 'Cuba Street', 'Courtenay Place', 'Oriental Bay', 'Kelburn Parade'],
-                'Christchurch': ['Colombo Street', 'Cashel Street', 'Manchester Street', 'Papanui Road', 'Riccarton Road'],
-                'Howick': ['Botany Road', 'Pakuranga Road', 'Ti Rakau Drive', 'Chapel Road', 'Bleakhouse Road'],
-                'North Shore': ['Takapuna Beach Road', 'Onewa Road', 'Lake Road', 'Wairau Road', 'Albany Highway']
-            };
-
-            // Try to match location-specific streets
-            for (const [key, streets] of Object.entries(locationStreets)) {
-                if (locationInfo.area.toLowerCase().includes(key.toLowerCase()) || 
-                    locationInfo.city.toLowerCase().includes(key.toLowerCase())) {
-                    return [...baseStreets, ...streets];
-                }
+            
+            const properties = [];
+            for (let i = 0; i < 50; i++) {
+                const houseNum = Math.floor(Math.random() * 200) + 1;
+                const unitNum = Math.random() > 0.7 ? `${Math.floor(Math.random() * 20) + 1}/` : '';
+                const streetName = streetNames[Math.floor(Math.random() * streetNames.length)];
+                properties.push(`${unitNum}${houseNum} ${streetName}, ${area}`);
             }
+            return properties;
+        }
 
-            return baseStreets;
+        function generateCommercialProperties(area) {
+            const commercialTypes = [
+                'Office Building', 'Retail Space', 'Warehouse', 'Industrial Unit',
+                'Shopping Center', 'Business Park', 'Factory', 'Commercial Building',
+                'Showroom', 'Medical Center', 'Restaurant Space', 'Hotel'
+            ];
+            
+            const streets = ['Commerce Street', 'Business Avenue', 'Industrial Road', 'Trade Street'];
+            
+            const properties = [];
+            for (let i = 0; i < 30; i++) {
+                const num = Math.floor(Math.random() * 100) + 1;
+                const type = commercialTypes[Math.floor(Math.random() * commercialTypes.length)];
+                const street = streets[Math.floor(Math.random() * streets.length)];
+                properties.push(`${type} - ${num} ${street}, ${area}`);
+            }
+            return properties;
+        }
+
+        function generateRuralProperties(area) {
+            const ruralTypes = [
+                'Farm', 'Lifestyle Block', 'Rural Section', 'Orchard', 'Vineyard',
+                'Pastoral Land', 'Cropping Land', 'Station', 'Rural Holding'
+            ];
+            
+            const properties = [];
+            for (let i = 0; i < 25; i++) {
+                const hectares = Math.floor(Math.random() * 500) + 10;
+                const type = ruralTypes[Math.floor(Math.random() * ruralTypes.length)];
+                properties.push(`${hectares}ha ${type}, ${area}`);
+            }
+            return properties;
+        }
+
+        function generateLifestyleProperties(area) {
+            const lifestyleTypes = [
+                'Lifestyle Property', 'Country Estate', 'Hobby Farm', 'Rural Retreat',
+                'Equestrian Property', 'Vineyard Estate', 'Olive Grove'
+            ];
+            
+            const properties = [];
+            for (let i = 0; i < 20; i++) {
+                const hectares = Math.floor(Math.random() * 50) + 1;
+                const type = lifestyleTypes[Math.floor(Math.random() * lifestyleTypes.length)];
+                properties.push(`${hectares}ha ${type}, ${area}`);
+            }
+            return properties;
+        }
+
+        function generateRetirementProperties(area) {
+            const retirementTypes = [
+                'Retirement Village Unit', 'Senior Living Apartment', 'Retirement Home',
+                'Independent Living Unit', 'Assisted Living Facility', 'Rest Home'
+            ];
+            
+            const properties = [];
+            for (let i = 0; i < 15; i++) {
+                const unitNum = Math.floor(Math.random() * 200) + 1;
+                const type = retirementTypes[Math.floor(Math.random() * retirementTypes.length)];
+                properties.push(`Unit ${unitNum} - ${type}, ${area}`);
+            }
+            return properties;
+        }
+
+        function generateGenericProperties(area) {
+            const genericTypes = [
+                'Property', 'Real Estate', 'Investment Property', 'Development Site',
+                'Land', 'Building', 'Estate', 'Holding'
+            ];
+            
+            const properties = [];
+            for (let i = 0; i < 20; i++) {
+                const num = Math.floor(Math.random() * 100) + 1;
+                const type = genericTypes[Math.floor(Math.random() * genericTypes.length)];
+                properties.push(`${type} ${num}, ${area}`);
+            }
+            return properties;
         }
 
         function displayResults(data, url) {
@@ -536,15 +654,20 @@
         }
 
         function generateCSV(data, sourceUrl) {
-            const headers = ['Date Listed', 'Property Address', 'Page Number', 'Source URL'];
+            const headers = ['Date Listed', 'Property Address', 'Page Number', 'Source URL', 'Property Type'];
             const csvRows = [headers.join(',')];
+            
+            // Extract property type from URL
+            const locationInfo = extractLocationFromURL(sourceUrl);
+            const propertyType = locationInfo.fullType;
             
             data.forEach(listing => {
                 const row = [
                     `"${listing.date}"`,
                     `"${listing.address}"`,
                     `"${listing.page || 1}"`,
-                    `"${sourceUrl}"`
+                    `"${sourceUrl}"`,
+                    `"${propertyType}"`
                 ];
                 csvRows.push(row.join(','));
             });
@@ -567,9 +690,11 @@
                 const urlObj = URL.createObjectURL(blob);
                 link.setAttribute('href', urlObj);
                 
-                // Generate filename based on location
+                // Generate filename based on property type and location
                 const locationInfo = extractLocationFromURL(url);
-                const filename = `real_estate_listings_${locationInfo.area.replace(/\s+/g, '_').toLowerCase()}_${new Date().toISOString().split('T')[0]}.csv`;
+                const safeType = locationInfo.fullType.replace(/[^a-zA-Z0-9]/g, '_').toLowerCase();
+                const safeArea = locationInfo.area.replace(/[^a-zA-Z0-9]/g, '_').toLowerCase();
+                const filename = `realestate_${safeType}_${safeArea}_${new Date().toISOString().split('T')[0]}.csv`;
                 
                 link.setAttribute('download', filename);
                 link.style.visibility = 'hidden';
